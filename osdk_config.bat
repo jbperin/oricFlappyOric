@@ -3,6 +3,6 @@
 ::
 :: Set the build paremeters
 ::
-SET OSDKADDR=$800
-SET OSDKNAME=flappy
+SET OSDKADDR=$500
+SET OSDKNAME=flappy3d
 SET OSDKFILE=MAIN
