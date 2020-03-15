@@ -37,7 +37,7 @@
 #ifdef COLORDEMO
 #define ANGLEONLY
 #define USE_ZBUFFER
-// #define USE_COLOR
+#define USE_COLOR
 #define USE_COLLISION_DETECTION
 #define USE_REWORKED_BUFFERS
 // #define USE_HORIZON

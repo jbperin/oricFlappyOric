@@ -171,7 +171,7 @@ void main()
    poke(0x24e, 255);
    poke(0x24f, 255);
 
-   image
+   // image
    hires();
    poke(0x26a, 10);
    memcpy((void *)0xa000, image, 8000);
