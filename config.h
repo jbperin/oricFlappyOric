@@ -2,72 +2,19 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Choose amongst TEXTDEMO, LRSDEMO, HRSDEMO, COLORDEMO, RTDEMO, PROFBENCH
-#define COLORDEMO
 
-/*
- *  SCREEN DIMENSION
- */
-
-#ifdef TEXTDEMO
-#define SCREEN_WIDTH 40
-#define SCREEN_HEIGHT 26
-#define USE_REWORKED_BUFFERS
-#define SAVE_ZERO_PAGE
-#endif
-
-#ifdef HRSDEMO
-#define USE_HIRES_RASTER
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 200
-#define SAVE_ZERO_PAGE
-#endif
-
-#ifdef LRSDEMO
 #define ANGLEONLY
 #define USE_ZBUFFER
-#define USE_COLLISION_DETECTION
-#define USE_REWORKED_BUFFERS
-#define SCREEN_WIDTH 40
-#define SCREEN_HEIGHT 26
-#endif
-
-
-
-#ifdef COLORDEMO
-#define ANGLEONLY
-#define USE_ZBUFFER
-#define USE_COLOR
+// #define USE_COLOR
 #define USE_COLLISION_DETECTION
 #define USE_REWORKED_BUFFERS
 // #define USE_HORIZON
 #define SCREEN_WIDTH 40
 #define SCREEN_HEIGHT 26
-#endif
 
+#define COLOR 22
+#define INK 5
 
-#ifdef RTDEMO
-#define ANGLEONLY
-#define USE_ZBUFFER
-#define USE_RT_KEYBOARD
-#define USE_COLLISION_DETECTION
-#define USE_COLOR
-#define USE_REWORKED_BUFFERS
-#define SCREEN_WIDTH 40
-#define SCREEN_HEIGHT 26
-#endif // RTDEMO
-
-#ifdef PROFBENCH
-#define ANGLEONLY
-#define USE_ZBUFFER
-#define USE_RT_KEYBOARD
-#undef USE_COLLISION_DETECTION
-#define USE_COLOR
-#define USE_REWORKED_BUFFERS
-#define USE_PROFILER
-#define SCREEN_WIDTH 40
-#define SCREEN_HEIGHT 26
-#endif // PROFBENCH
 
 
 /*

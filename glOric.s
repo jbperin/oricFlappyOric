@@ -2454,7 +2454,7 @@ fill8_done:
 #endif USE_ASM_FILL8
 
 
-
+#define BRES_LIMIT 1
 
 #ifdef USE_ASM_BRESTYPE1
 ;; void bresStepType1()
@@ -2472,7 +2472,7 @@ bresStepType1_Lbresfill133
 	lda tmp0 : ora tmp0+1 : beq *+5 : jmp bresStepType1_Lbresfill135 :
 	lda _A1Y : sta tmp0 :
 	lda #0 : ldx tmp0 : stx tmp0 : .( : bpl skip : lda #$FF :skip : .)  : sta tmp0+1 :
-	lda #<(1) : cmp tmp0 : lda #>(1) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType1_Lbresfill132 :skip : .) : : :
+	lda #<(BRES_LIMIT) : cmp tmp0 : lda #>(BRES_LIMIT) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType1_Lbresfill132 :skip : .) : : :
 bresStepType1_Lbresfill135
 .)
 	rts
@@ -2496,7 +2496,7 @@ bresStepType2_Lbresfill137
 	lda tmp0 : ora tmp0+1 : beq *+5 : jmp bresStepType2_Lbresfill140 :
 	lda _A1Y : sta tmp0 :
 	lda #0 : ldx tmp0 : stx tmp0 : .( : bpl skip : lda #$FF :skip : .)  : sta tmp0+1 :
-	lda #<(1) : cmp tmp0 : lda #>(1) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType2_Lbresfill136 :skip : .) : : :
+	lda #<(BRES_LIMIT) : cmp tmp0 : lda #>(BRES_LIMIT) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType2_Lbresfill136 :skip : .) : : :
 bresStepType2_Lbresfill140
 .)
 	rts
@@ -2521,7 +2521,7 @@ bresStepType3_Lbresfill142
 	lda tmp0 : ora tmp0+1 : beq *+5 : jmp bresStepType3_Lbresfill145 :
 	lda _A1Y : sta tmp0 :
 	lda #0 : ldx tmp0 : stx tmp0 : .( : bpl skip : lda #$FF :skip : .)  : sta tmp0+1 :
-	lda #<(1) : cmp tmp0 : lda #>(1) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType3_Lbresfill141 :skip : .) : : :
+	lda #<(BRES_LIMIT) : cmp tmp0 : lda #>(BRES_LIMIT) : sbc tmp0+1 : .( : bvc *+4 : eor #$80 : bpl skip : jmp bresStepType3_Lbresfill141 :skip : .) : : :
 bresStepType3_Lbresfill145
 .)
 	rts
@@ -4293,12 +4293,12 @@ initScreenBuffersLoop_01:
     sta _zbuffer+SCREEN_WIDTH*23 , x
     sta _zbuffer+SCREEN_WIDTH*24 , x
     sta _zbuffer+SCREEN_WIDTH*25 , x 
-    ; BUGFIX sta _zbuffer+SCREEN_WIDTH*26 , x
+    ; sta _zbuffer+SCREEN_WIDTH*26 , x
     dex
     bne initScreenBuffersLoop_01
 
 #ifndef USE_HORIZON
-    lda #$20
+    lda #22
 #endif // USE_HORIZON
 
     ldx #SCREEN_WIDTH-1
@@ -4345,6 +4345,40 @@ initScreenBuffersLoop_02:
  	beq initScreenBuffersDone
 #endif // USE_COLOR
     bpl initScreenBuffersLoop_02
+
+	lda #INK
+    sta _fbuffer+SCREEN_WIDTH*0 +1
+    sta _fbuffer+SCREEN_WIDTH*1 +1
+    sta _fbuffer+SCREEN_WIDTH*2 +1
+    sta _fbuffer+SCREEN_WIDTH*3 +1
+    sta _fbuffer+SCREEN_WIDTH*4 +1
+    sta _fbuffer+SCREEN_WIDTH*5 +1
+    sta _fbuffer+SCREEN_WIDTH*6 +1
+    sta _fbuffer+SCREEN_WIDTH*7 +1
+    sta _fbuffer+SCREEN_WIDTH*8 +1
+    sta _fbuffer+SCREEN_WIDTH*9 +1
+    sta _fbuffer+SCREEN_WIDTH*10+1
+    sta _fbuffer+SCREEN_WIDTH*11+1
+    sta _fbuffer+SCREEN_WIDTH*12+1
+    sta _fbuffer+SCREEN_WIDTH*13+1
+    sta _fbuffer+SCREEN_WIDTH*14+1
+    sta _fbuffer+SCREEN_WIDTH*15+1
+    sta _fbuffer+SCREEN_WIDTH*16+1
+    sta _fbuffer+SCREEN_WIDTH*17+1
+    sta _fbuffer+SCREEN_WIDTH*18+1
+    sta _fbuffer+SCREEN_WIDTH*19+1
+    sta _fbuffer+SCREEN_WIDTH*20+1
+    sta _fbuffer+SCREEN_WIDTH*21+1
+#ifndef USE_COLOR
+    sta _fbuffer+SCREEN_WIDTH*22+1
+    sta _fbuffer+SCREEN_WIDTH*23+1
+    sta _fbuffer+SCREEN_WIDTH*24+1
+    sta _fbuffer+SCREEN_WIDTH*25+1
+    sta _fbuffer+SCREEN_WIDTH*26+1
+#endif
+
+
+
 initScreenBuffersDone:
 .)
     rts
@@ -4383,7 +4417,7 @@ _fastzplot:
     tax
 
 	lda		_plotX
-#ifdef USE_COLOR
+; #ifdef USE_COLOR
 	sec
 	sbc		#COLUMN_OF_COLOR_ATTRIBUTE
 	bvc		*+4
@@ -4394,12 +4428,12 @@ _fastzplot:
     cmp		#SCREEN_WIDTH
     bcs		fastzplot_done
 
-#else
-    beq		fastzplot_done
-    bmi		fastzplot_done
-    cmp		#SCREEN_WIDTH
-    bcs		fastzplot_done
-#endif
+; #else
+;     beq		fastzplot_done
+;     bmi		fastzplot_done
+;     cmp		#SCREEN_WIDTH
+;     bcs		fastzplot_done
+; #endif
 
     // ptrZbuf = zbuffer + Y*SCREEN_WIDTH+X;;
 	lda		ZBufferAdressLow,x	; Get the LOW part of the zbuffer adress
@@ -4667,7 +4701,7 @@ _hzfill:
 	; bmi hzfill_A2xOverOrEqualA1x
 	lda _A1Right ; (A1X > A2X)
 	beq hzfill_A2xOverOrEqualA1x
-#ifdef USE_COLOR
+; #ifdef USE_COLOR
 //		dx = max(2, A2X);
 		lda _A2X
 		sec
@@ -4679,12 +4713,12 @@ _hzfill:
 		jmp hzfill_A2xPositiv
 hzfill_A2xLowerThan3:
 		lda #COLUMN_OF_COLOR_ATTRIBUTE
-#else
-//      dx = max(0, A2X);
-		lda _A2X
-		bpl hzfill_A2xPositiv
-		lda #0
-#endif
+; #else
+; //      dx = max(0, A2X);
+; 		lda _A2X
+; 		bpl hzfill_A2xPositiv
+; 		lda #0
+; #endif
 hzfill_A2xPositiv:
 		sta departX ; dx
 //         fx = min(A1X, SCREEN_WIDTH - 1);
@@ -4701,7 +4735,7 @@ hzfill_A1xOverScreenWidth:
 		jmp hzfill_computeNbPoints
 hzfill_A2xOverOrEqualA1x:
 //     } else {
-#ifdef USE_COLOR
+; #ifdef USE_COLOR
 //		dx = max(2, A1X);
 		lda _A1X
 		sec
@@ -4713,12 +4747,12 @@ hzfill_A2xOverOrEqualA1x:
 		jmp hzfill_A1xPositiv
 hzfill_A1xLowerThan3:
 		lda #COLUMN_OF_COLOR_ATTRIBUTE
-#else
-//      dx = max(0, A1X);
-		lda _A1X
-		bpl hzfill_A1xPositiv
-		lda #0
-#endif
+; #else
+; //      dx = max(0, A1X);
+; 		lda _A1X
+; 		bpl hzfill_A1xPositiv
+; 		lda #0
+; #endif
 hzfill_A1xPositiv:
 		sta departX
 //         fx = min(A2X, SCREEN_WIDTH - 1);
@@ -5601,12 +5635,14 @@ glDrawSegments_loop:
 moynottoobig:
         lda _dmoy
         lsr
+		sec
+		sbc #4
         sta _distseg
 //         distseg = (unsigned char)((dmoy)&0x00FF);
 //         distseg--;  // FIXME
 
 glDrawSegments_drawline:
-        dec _distseg
+        ;;dec _distseg:dec _distseg :dec _distseg ;;:dec _distseg
 
 #ifdef ANGLEONLY
 //         P1X = (SCREEN_WIDTH - P1AH) >> 1;

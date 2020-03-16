@@ -7,17 +7,17 @@
 #define SCREEN_START_ADDRES (0xbb80 + 40)
 #define MAX_Y 27
 #define SCREEN_LEN (MAX_Y * 40)
-#define COLOR 22
-#define INK 5
 #define PLAYER_X 7
 #define GRAVITY 17
 #define FORCE 42
+#define TITLE_HELP (0xbb80 + 7 + 16 * 40)
 #define TITLE_TEXT0 (0xbb80 + 4 + 6 * 40)
 #define TITLE_TEXT1 (0xbb80 + 8 + 10 * 40)
 #define TITLE_TEXT2 (0xbb80 + 12 + 12 * 40)
 #define TITLE_TEXT3 (0xbb80 + 12 + 13 * 40)
 #define TITLE_TEXT4 (0xbb80 + 12 + 14 * 40)
 #define TITLE_TEXT5 (0xbb80 + 1 + 18 * 40)
+#define TITLE_TEXT6 (0xbb80 + 15 + 24 * 40)
 #define TITLE_TEXT7 (0xbb80 + 15 + 25 * 40)
 #define TITLE_TEXT8 (0xbb80 + 1 + 26 * 40)
 
@@ -62,6 +62,10 @@ unsigned char screenBuffer[SCREEN_LEN] = {0};
 
 unsigned char pipeInverval, keyHitCounter, hitCounterLen, state, key1, sleep;
 unsigned int playerOldAddress, dy, playerY, score;
+
+unsigned char pos;
+unsigned char counter, drawPipe;
+unsigned char view_mode; // * 1: First Person View * 0: Third person view
 
 static unsigned char charset[] = {
 
@@ -180,6 +184,7 @@ void main()
 
    text();
    poke(0x26a, 10);
+   view_mode = 1; 
 
    while (state != STATE_END)
    {
@@ -201,13 +206,17 @@ void main()
 
          initScreenBuffers();
          glProjectArrays();
-         glDrawFaces();
-         glDrawSegments();
-         buffer2screen((void*)ADR_BASE_LORES_SCREEN);
-         // ii ^= 1;
-         // if (ii) buffer2screen((void*)ADR_BASE_LORES_SCREEN);
-         // else memcpy((void *)SCREEN_START_ADDRES, (void *)screenBuffer, SCREEN_LEN);
-         // wait(sleep);
+
+         if (view_mode == 0) {
+            glDrawFaces();
+            glDrawSegments();
+            glDrawParticules();
+            buffer2screen((void*)ADR_BASE_LORES_SCREEN);
+            if (sleep != 0 ) wait (2);
+         } else {
+            memcpy((void *)SCREEN_START_ADDRES, (void *)screenBuffer, SCREEN_LEN);
+            wait(sleep);
+         }      
       }
       key();
       get();
@@ -226,16 +235,18 @@ void title()
    memcpy((void *)0xb508, charset, sizeof(charset));
 
    //text
-   sprintf(TITLE_TEXT0, "\xa\x1* * *  Flappy Oric :)  * * *");
-   sprintf(TITLE_TEXT0 + 40, "\xa\x1* * *  Flappy Oric :)  * * *");
+   sprintf(TITLE_TEXT0, "\xa\x1* * *  Flappy Oric 3D :)  * * *");
+   sprintf(TITLE_TEXT0 + 40, "\xa\x1* * *  Flappy Oric 3D :)  * * *");
    sprintf(TITLE_TEXT1, "\x4 Choose your destiny:");
    sprintf(TITLE_TEXT2, "\x4 1.. Easy");
    sprintf(TITLE_TEXT3, "\x4 2.. Normal");
    sprintf(TITLE_TEXT4, "\x4 3.. Hard");
 
-   sprintf(TITLE_TEXT5, "\04Discussion in forum.defence-force.org");
+  sprintf(TITLE_HELP, "\04 Key V to switch view mode ");
+  sprintf(TITLE_TEXT5, "\04Discussion in forum.defence-force.org");
 
-   sprintf(TITLE_TEXT7, "\05 implementation: raxiss");
+   sprintf(TITLE_TEXT6, "\05 implementation: raxiss");
+   sprintf(TITLE_TEXT7, "\05       3D patched: JiBe");
    sprintf(TITLE_TEXT8, "\05 based on idea and sprites of: peacer");
    key();
 
@@ -264,24 +275,24 @@ void title()
 
    cls();
 
-   // // set sprites
-   // memcpy((void *)(0xb400 + 'a' * 8), (void *)font, sizeof(font));
+   // set sprites
+   memcpy((void *)(0xb400 + 'a' * 8), (void *)font, sizeof(font));
 
    //clear screen buffer
    memset((void *)screenBuffer, COLOR, SCREEN_LEN);
 
    // invert pipe chars
-   // for (addr = 0xb400 + 'g' * 8; addr < 0xb400 + 'g' * 8 + 6 * 8; ++addr)
-   // {
-   //    poke(addr, ~peek(addr));
-   // }
+   for (addr = 0xb400 + 'g' * 8; addr < 0xb400 + 'g' * 8 + 6 * 8; ++addr)
+   {
+      poke(addr, ~peek(addr));
+   }
 }
-unsigned char pos;
-unsigned char counter, drawPipe;
+
 void player()
 {
    static unsigned int addr;
    unsigned int player_div_100;
+   char the_key;
 
    // delete old bird
    screenBuffer[playerOldAddress++] = COLOR;
@@ -295,12 +306,17 @@ void player()
    dy += GRAVITY;
 
    // read key
-   switch (key())
+   switch (the_key=key())
    {
    case 0:
       break;
 
+   case 86: // V
+      view_mode = (view_mode == 0) ? 1: 0; // switch view mode
+      break;
+
    default:
+      
       keyHitCounter = hitCounterLen;
       dy = dy > 0 ? 0 : dy + FORCE;
       break;
@@ -340,7 +356,7 @@ void player()
       playerY = MAX_Y * 100 - 200;
    }
 
-   sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d    ", score, pos, playerY, counter);
+   // sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d    ", score, pos, playerY, counter);
 #ifdef USE_COLOR
    CamPosZ = -player_div_100-1;
 #else
@@ -400,7 +416,8 @@ void scroll()
          tempPipe[4][pos + y] = ' ';
       }
    }
-   sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d  ", score, pos, playerY, counter);
+   // sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d  ", score, pos, playerY, counter);
+   sprintf(SCORE_ADDR, "SCORE: %d ", score);
    // if a pipe is drawn, its 6 lines
    if (drawPipe)
    {
