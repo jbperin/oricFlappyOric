@@ -1,33 +1,70 @@
 #include "config.h"
 #include "glOric.h"
 
-#define INK_BLACK	0
-#define INK_RED		1
-#define INK_GREEN	2
-#define INK_YELLOW	3
-#define INK_BLUE	4
-#define INK_MAGENTA	5
-#define INK_CYAN	6
-#define INK_WHITE	7
-#define LORES_SCREEN_ADDRESS 0xBB80
-#define HIRES_SCREEN_ADDRESS 0xA000
-
 #define LORES_SCREEN_WIDTH 40
 #define LORES_SCREEN_HEIGHT 26
 
-#define TEXT_50Hz	26
-#define HIRES_50Hz	30
-
-#define TEXTURE_1 'b'
-#define TEXTURE_2 '*'
-#define TEXTURE_3 'y'
-#define TEXTURE_4 'h'
-#define TEXTURE_5 'm'
-#define TEXTURE_6 'r'
-#define TEXTURE_7 'f'
 
 
-unsigned char tab_color [] = {INK_CYAN, INK_YELLOW, INK_MAGENTA, INK_BLUE, INK_GREEN, INK_RED, INK_CYAN, INK_YELLOW} ;
+/*  __                             
+ * / _\     ___   ___  _ __    ___ 
+ * \ \     / __| / _ \| '_ \  / _ \
+ * _\ \   | (__ |  __/| | | ||  __/
+ * \__/    \___| \___||_| |_| \___|
+ */                                
+/*                                                                              
+                                      16____________________________\_______17 
+                                     //           ..          .     .\      /| 
+                                   //           ..          ..      .      / | 
+                                 //            .           .        .     /  | 
+                               //            ..           .         .    /   | 
+                             //             .            .          .   /    | 
+                           //             ..            .           .  /     | 
+                         //             ..            ..            . /      | 
+                       //              .             .              ./       | 
+                     //              _____________  .               /        | 
+                   //               4              7              //.        | 
+                 //               ..|              |             /  .        | 
+               //               ..  |       10.... | ____11     /   . HAUT  |  
+             //                .    |      ..      |     /     /    .        | 
+           //                ..     |     .        |    /     /     .        | 
+         //                 .       |   ..         |   /     /      .        | 
+       //                 ..        |  .           |  /     /       .        | 
+     //                 ..          |..            | /     /        .        | 
+   //                               5______________6/     /         .        | 
+ 12.....................................................13          .        | 
+ |                                                                  .        | 
+ |                                                                  .        | 
+ |                                                                  .        | 
+ |                             SPACE            /                   .        | 
+ |                                            /_______\\____/       .        | 
+ |                                         ///8        /\ /9        .        | 
+ |                                       //    PROF  //  /          .        | 
+ |                                     //           /   /         \ .        | 
+ |                                   //17________\\/__/______\_____\\_______18 
+ |                                   1               2        \.            /  
+ |                                 //:               |        .\           /   
+ |                               //  :               |       .  ||        /    
+ |                             //    :               |      .            /     
+ |                           //      :               |     .            /      
+ |                         //        :               |    .            /       
+ |                       //          :               |   .            /        
+ |                     //            :               |  .            /         
+ |                   //             .0_______________3 . MAX_PROF   /          
+ |                 //              .     2*LARG      ..           //           
+ |               //              ..                 .            /             
+ |             //               .                  .            /              
+ |           //             T ..                  .            /               
+ |         //              S .                   .            /                
+ |       //              I ..                   .            /                 
+ |     //              D ..                    .            /                  
+ |   //                 .                     .            /                   
+ | //                 ..                     .            /                    
+ |/                                        \\            /                     
+ 15..........................M.A.X._.L.A.R G\\..........14                     
+                                             \\\                               
+                    
+*/
 
 #define LARG 4
 #define DIST 20
@@ -40,11 +77,12 @@ unsigned char tab_color [] = {INK_CYAN, INK_YELLOW, INK_MAGENTA, INK_BLUE, INK_G
 #define MAX_PROF 60
 
 #define SCREW 1
+
 char geomPipe []= {
-/* Nb Coords = */ 20,
-/* Nb Faces = */ 8,
-/* Nb Segments = */ 16,
-/* Nb Particules = */ 6,
+/* Nb Coords = */       20,
+/* Nb Faces = */        8,
+/* Nb Segments = */     16,
+/* Nb Particules = */   6,
 // Coord List : X, Y, Z, unused
      DIST,  -LARG,      -HAUT,  0, 
      DIST,  -LARG, -POS-SPACE,  1,
@@ -71,36 +109,24 @@ char geomPipe []= {
   MAX_PROF, +MAX_LARG,   -MAX_HAUT, 18,
   MAX_PROF, -MAX_LARG,   -MAX_HAUT, 19,
 
-//          0, -MAX_LARG, -MAX_HAUT/2, 20, 
-//   MAX_PROF, -MAX_LARG, -MAX_HAUT/2, 21,
-//   MAX_PROF, +MAX_LARG, -MAX_HAUT/2, 22,
-//          0, +MAX_LARG, -MAX_HAUT/2, 23,
-
 // Face List : idxPoint1, idxPoint2, idxPoint3, character 
-  0, 1, 2, TEXTURE_4+128,
-  0, 2, 3, TEXTURE_4+128,
-  4, 5, 6, TEXTURE_4+128,
-  4, 6, 7, TEXTURE_4+128,
-  1, 2, 8, TEXTURE_4,
-  2, 8, 9, TEXTURE_4,
- 5, 6, 10, TEXTURE_4,
- 6,10, 11, TEXTURE_4,
+  0, 1, 2, 'h'+128,
+  0, 2, 3, 'h'+128,
+  4, 5, 6, 'h'+128,
+  4, 6, 7, 'h'+128,
+  1, 2, 8, 'h',
+  2, 8, 9, 'h',
+ 5, 6, 10, 'h',
+ 6,10, 11, 'h',
 // Segment List : idxPoint1, idxPoint2, idxPoint3, character 
 0, 1, 'i'+128, 0,
 1, 2, 'k'+128, 0,
 2, 3, 'g'+128, 0,
-// 0, 3, 'k'+128, 0,
 4, 5, 'i'+128, 0,
 5, 6, 'k'+128, 0,
 6, 7, 'g'+128, 0,
-// 4, 7, 'k'+128, 0,
-// 1, 8, '/'+128, 0,
-// 2, 9, '/'+128, 0,
-// 10,5, '/'+128, 0,
-// 11,6, '/'+128, 0,
 8, 9, 'k'+128, 0,
 10, 11, 'k'+128, 0,
-
 16, 12, '.', 0,
 17, 13, '.', 0,
 14, 18, '.', 0,
@@ -109,12 +135,6 @@ char geomPipe []= {
 17, 18, ':', 0,
 18, 19, '-', 0,
 19, 16, ':', 0,
-
-// 20, 21, '.', 0,
-// 21, 22, '.', 0,
-// 22, 23, '.', 0,
-
-
 // Particule List : idxPoint1, character 
 1, 'l'+128,
 2, 'j'+128,
@@ -122,36 +142,71 @@ char geomPipe []= {
 6, 'j'+128,
 4, ' ',
 7, ' ',
-
 };
 
+void initGl (){
+    int ii;
 
+    /*
+     * Scene geometry
+     */
+    nbPoints     = 0;
+    nbSegments   = 0;
+    nbFaces      = 0;
+    nbParticules = 0;
 
-extern char          ch2disp;
-extern signed char points2dL[];
+    addGeom(0, 0, 0, 1, 1, 1, 0, geomPipe);
+
+    /* 
+     * Camera position  and Orientation 
+     */
+    CamPosX = 12;
+    CamPosY = 0;
+    CamPosZ = -13;
+
+    CamRotZ = 0;
+    CamRotX = 0;
+
+    change_char(36, 0x80, 0x40, 020, 0x10, 0x08, 0x04, 0x02, 0x01);
+    for (ii = 0; ii<=LORES_SCREEN_HEIGHT; ii++){
+        fbuffer[ii*LORES_SCREEN_WIDTH]=COLOR ;
+        fbuffer[ii*LORES_SCREEN_WIDTH+1]=INK ;
+    }
+}
+
+/*     ___                         _               
+ *    /   \ _ __   __ _ __      __(_) _ __    __ _ 
+ *   / /\ /| '__| / _` |\ \ /\ / /| || '_ \  / _` |
+ *  / /_// | |   | (_| | \ V  V / | || | | || (_| |
+ * /___,'  |_|    \__,_|  \_/\_/  |_||_| |_| \__, |
+ *                                          |___/ 
+ */
+
 extern signed char points2aH[];
 extern signed char points2aV[];
-extern signed char   P1X, P1Y;
+
 void glDrawParticules(){
-    unsigned char ii = 0;
-
-    unsigned char idxPt, offPt, dchar;
-    unsigned int  dist;
-
+    unsigned char ii;
+    unsigned char idxPt;
 
     for (ii = 0; ii < nbParticules; ii++) {
-        idxPt    = particulesPt[ii];  // ii*SIZEOF_SEGMENT +0
-        ch2disp = particulesChar[ii];    // ii*SIZEOF_SEGMENT +2
-        // printf ("particules : %d %d\n ", idxPt, ch2disp);
-        dchar = 0; //FIXME : points2dL[idxPt]-2 ;  to helps particule to be displayed
-        P1X = (SCREEN_WIDTH -points2aH[idxPt]) >> 1;
-        P1Y = (SCREEN_HEIGHT - points2aV[idxPt]) >> 1;
-
-        zplot(P1X, P1Y, dchar, ch2disp);
-
+        idxPt    = particulesPt[ii];
+        zplot(
+            (SCREEN_WIDTH -points2aH[idxPt]) >> 1,      // PX
+            (SCREEN_HEIGHT - points2aV[idxPt]) >> 1,    // PY
+            0, // points2dL[idxPt]-2,                   // distance
+            particulesChar[ii]                          // character 2 display
+        );
     }
-
 }
+
+
+/*    ___         _  _      _ 
+ *   / __\ _   _ (_)| |  __| |
+ *  /__\//| | | || || | / _` |
+ * / \/  \| |_| || || || (_| |
+ * \_____/ \__,_||_||_| \__,_|
+ */                           
 
 void addGeom(
     signed char   X,
@@ -204,71 +259,19 @@ void change_char(char c, unsigned char patt01, unsigned char patt02, unsigned ch
     *(adr++) = patt08;
 }
 
-#ifdef USE_COLOR
 
 
-void prepare_colors() {
-    int ii, jj;
-
-	for (ii = 0; ii<=LORES_SCREEN_HEIGHT-NB_LESS_LINES_4_COLOR ; ii++){
-		poke (LORES_SCREEN_ADDRESS+(ii*LORES_SCREEN_WIDTH)+0,HIRES_50Hz);
-#ifdef USE_ZBUFFER
-		fbuffer[ii*LORES_SCREEN_WIDTH]=HIRES_50Hz;
-#endif // USE_ZBUFFER
-		for (jj = 0; jj < 8; jj++) {
-			poke (HIRES_SCREEN_ADDRESS+((ii*8+jj)*LORES_SCREEN_WIDTH)+1, tab_color[jj]);
-			poke (HIRES_SCREEN_ADDRESS+((ii*8+jj)*LORES_SCREEN_WIDTH)+2, TEXT_50Hz);
-		}
-	}
-}
-void initColors(){
-
-    prepare_colors();
-    //              CYAN, YELLO, MAGE, BLUE GREEN, RED, CYAN, YELLO
-    change_char('c', 0x7F, 0x00, 0x00, 0x7F, 0x00, 0x00, 0x7F, 0x00);
-	change_char('y', 0x00, 0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F);
-	change_char('m', 0x00, 0x00, 0x7F, 0x00, 0x00, 0x7F, 0x00, 0x00);
-	change_char('r', 0x00, 0x55, 0x7F, 0x00, 0x55, 0x7F, 0x00, 0x00);
-	change_char('g', 0x55, 0xAA, 0x00, 0x00, 0x7F, 0x00, 0x55, 0xAA);
-	change_char('b', 0xAA, 0x00, 0x00, 0x7F, 0x00, 0x00, 0x55, 0x00);
-
-	change_char('f', 0x00, 0xAA, 0x00, 0x55, 0x7F, 0x00, 0x00, 0xAA);
-
-}
-#endif
-
-void initGl (){
-    int ii;
-    nbPoints     = 0;
-    nbSegments   = 0;
-    nbFaces      = 0;
-    nbParticules = 0;
-
-    CamPosX = 12;
-    CamPosY = 0;
-    CamPosZ = -13;
-
-    CamRotZ = 0;
-    CamRotX = 0;
-
-    change_char(36, 0x80, 0x40, 020, 0x10, 0x08, 0x04, 0x02, 0x01);
-#ifdef USE_COLOR
-    // initColors();
-#endif
-	for (ii = 0; ii<=LORES_SCREEN_HEIGHT; ii++){
-		fbuffer[ii*LORES_SCREEN_WIDTH]=COLOR ;//TEXT_50Hz;
-		fbuffer[ii*LORES_SCREEN_WIDTH+1]=INK ;//TEXT_50Hz;
-    }
-    // printf ("***************\n");
-    addGeom(0, 0, 0, 1, 1, 1, 0, geomPipe);
-    // printf ("++++++++++++++++\n");get();
-}
 
 
+/*                          
+ *   /\/\    ___  __   __  ___ 
+ *  /    \  / _ \ \ \ / / / _ \
+ * / /\/\ \| (_) | \ V / |  __/
+ * \/    \/ \___/   \_/   \___|
+ *                            
+ */
 void moveShape (unsigned char pos, unsigned char counter){
 
-
-    // points3dX[nbPoints] = X + ((orientation == 0) ? sizeX * geom[4+kk*SIZEOF_3DPOINT+0]: sizeY * geom[4+kk*SIZEOF_3DPOINT+1]);// X + ii;
     points3dX[ 0] = counter;
     points3dX[ 1] = counter;
     points3dX[ 2] = counter;
@@ -290,7 +293,5 @@ void moveShape (unsigned char pos, unsigned char counter){
     points3dZ[ 6] = -pos;
     points3dZ[ 10] = -pos;
     points3dZ[ 11] = -pos;
-    
-
 }
 

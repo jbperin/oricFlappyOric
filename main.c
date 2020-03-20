@@ -356,12 +356,9 @@ void player()
       playerY = MAX_Y * 100 - 200;
    }
 
-   // sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d    ", score, pos, playerY, counter);
-#ifdef USE_COLOR
-   CamPosZ = -player_div_100-1;
-#else
+   // update point of view in 3D mode
    CamPosZ = -player_div_100;
-#endif
+
    // draw bird
    screenBuffer[addr++] = CHAR_BIRD1;
    screenBuffer[addr++] = CHAR_BIRD2;
@@ -416,7 +413,7 @@ void scroll()
          tempPipe[4][pos + y] = ' ';
       }
    }
-   // sprintf(SCORE_ADDR, "SCORE: %d pos= %d plaY = %d cnt=%d  ", score, pos, playerY, counter);
+
    sprintf(SCORE_ADDR, "SCORE: %d ", score);
    // if a pipe is drawn, its 6 lines
    if (drawPipe)
@@ -471,23 +468,14 @@ void scroll()
       // calc new line addr
       addr += 38;
    }
-
    --counter;
-
+   // update 3D scene
    moveShape (pos, counter);
 }
 
-
 void wait(unsigned int time)
 {
-   if (time == 0)
-   {
-      return;
-   }
-
+   if (time == 0) return;
    doke(0x276, time);
-   while (deek(0x276) > 0)
-   {
-      ;
-   }
+   while (deek(0x276) > 0);
 }
